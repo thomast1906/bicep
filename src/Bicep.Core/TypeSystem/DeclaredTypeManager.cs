@@ -150,12 +150,24 @@ namespace Bicep.Core.TypeSystem
             switch (symbol)
             {
                 case ResourceSymbol resourceSymbol when IsCycleFree(resourceSymbol):
-                    // the declared type of the body is more useful to us than the declared type of the resource itself
-                    return this.GetDeclaredTypeAssignment(resourceSymbol.DeclaringResource.Value);
+                    // the declared type of the resource/loop/if body is more useful to us than the declared type of the resource itself
+                    var innerResourceBody = resourceSymbol.DeclaringResource.TryGetBody();
+                    if (innerResourceBody != null)
+                    {
+                        return this.GetDeclaredTypeAssignment(innerResourceBody);
+                    }
+
+                    break;
 
                 case ModuleSymbol moduleSymbol when IsCycleFree(moduleSymbol):
-                    // the declared type of the body is more useful to us than the declared type of the module itself
-                    return this.GetDeclaredTypeAssignment(moduleSymbol.DeclaringModule.Value);
+                    // the declared type of the module/loop/if body is more useful to us than the declared type of the module itself
+                    var innerModuleBody = moduleSymbol.DeclaringModule.TryGetBody();
+                    if (innerModuleBody != null)
+                    {
+                        return this.GetDeclaredTypeAssignment(innerModuleBody);
+                    }
+
+                    break;
 
                 case DeclaredSymbol declaredSymbol when IsCycleFree(declaredSymbol):
                     // the syntax node is referencing a declared symbol
