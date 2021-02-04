@@ -516,6 +516,20 @@ var nestedDiscriminatorCompletions4 = nestedDiscriminator['properties'].
 // #completionTest(79) -> defaultCreateModeIndexes
 var nestedDiscriminatorArrayIndexCompletions = nestedDiscriminator.properties[a]
 
+// sample resource to validate completions on the next declarations
+resource nestedPropertyAccessOnConditional 'Microsoft.Compute/virtualMachines@2020-06-01' = if(true) {
+  location: 'test'
+  name: 'test'
+  properties: {
+    additionalCapabilities: {
+      
+    }
+  }
+}
+// this validates that we can get nested property access completions on a conditional resource
+//#completionTest(56) -> vmProperties
+var sigh = nestedPropertyAccessOnConditional.properties.
+
 resource selfScope 'My.Rp/mockResource@2020-12-01' = {
   name: 'selfScope'
   scope: selfScope
