@@ -54,6 +54,11 @@ namespace Bicep.Core.Syntax
 
         public bool IsExistingResource() => ExistingKeyword is not null;
 
+        /// <summary>
+        /// Returns the declared type of the resource body (based on the type string).
+        /// Returns the same value for single resource or resource loops declarations.
+        /// </summary>
+        /// <param name="resourceTypeProvider">resource type provider</param>
         public TypeSymbol GetDeclaredType(IResourceTypeProvider resourceTypeProvider)
         {
             var stringSyntax = this.TypeString;

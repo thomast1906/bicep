@@ -70,6 +70,9 @@ namespace Bicep.Core.TypeSystem
                 case IfConditionSyntax ifCondition:
                     return GetIfConditionType(ifCondition);
 
+                case ForSyntax @for:
+                    return GetForSyntaxType(@for);
+
                 case PropertyAccessSyntax propertyAccess:
                     return GetPropertyAccessType(propertyAccess);
 
@@ -104,7 +107,15 @@ namespace Bicep.Core.TypeSystem
 
         private DeclaredTypeAssignment GetParameterType(ParameterDeclarationSyntax syntax) => new DeclaredTypeAssignment(syntax.GetDeclaredType(), syntax);
 
-        private DeclaredTypeAssignment GetResourceType(ResourceDeclarationSyntax syntax) => new DeclaredTypeAssignment(syntax.GetDeclaredType(this.resourceTypeProvider), syntax);
+        private DeclaredTypeAssignment GetResourceType(ResourceDeclarationSyntax syntax)
+        {
+            var declaredResourceType = syntax.GetDeclaredType(this.resourceTypeProvider);
+
+            // if the value is a loop (not a condition or object), the type is an array of the declared resource type
+            return new DeclaredTypeAssignment(
+                syntax.Value is ForSyntax ? new TypedArrayType(declaredResourceType, TypeSymbolValidationFlags.Default) : declaredResourceType,
+                syntax);
+        }
 
         private DeclaredTypeAssignment GetModuleType(ModuleDeclarationSyntax syntax)
         {
@@ -118,7 +129,12 @@ namespace Bicep.Core.TypeSystem
                 return new DeclaredTypeAssignment(ErrorType.Create(failureDiagnostic), syntax);
             }
 
-            return new DeclaredTypeAssignment(syntax.GetDeclaredType(this.binder.TargetScope, moduleSemanticModel), syntax);
+            var declaredModuleType = syntax.GetDeclaredType(this.binder.TargetScope, moduleSemanticModel);
+            
+            // if the value is a loop (not a condition or object), the type is an array of the declared module type
+            return new DeclaredTypeAssignment(
+                syntax.Value is ForSyntax ? new TypedArrayType(declaredModuleType, TypeSymbolValidationFlags.Default) : declaredModuleType,
+                syntax);
         }
 
         private DeclaredTypeAssignment? GetVariableAccessType(VariableAccessSyntax syntax)
@@ -271,18 +287,41 @@ namespace Bicep.Core.TypeSystem
             }
 
             var parentType = parentTypeAssignment.Reference.Type;
-
-            switch (parent)
+            if (parentType is not ModuleType && parentType is not ResourceType)
             {
-                case ResourceDeclarationSyntax _ when parentType is ResourceType resourceType && syntax.Body is ObjectSyntax resourceBody:
-                    return TryCreateAssignment(ResolveDiscriminatedObjects(resourceType.Body.Type, resourceBody), syntax);
-
-                case ModuleDeclarationSyntax _ when parentType is ModuleType moduleType && syntax.Body is ObjectSyntax moduleBody:
-                    return TryCreateAssignment(ResolveDiscriminatedObjects(moduleType.Body.Type, moduleBody), syntax);
-
-                default:
-                    return null;
+                // no point to propagate the type through if we have the wrong parent
+                return null;
             }
+
+            return TryCreateAssignment(parentType, syntax, parentTypeAssignment.Flags);
+        }
+
+        private DeclaredTypeAssignment? GetForSyntaxType(ForSyntax syntax)
+        {
+            var parent = this.binder.GetParent(syntax);
+            if (parent == null)
+            {
+                return null;
+            }
+
+            var parentTypeAssignment = GetDeclaredTypeAssignment(parent);
+            if (parentTypeAssignment == null)
+            {
+                return null;
+            }
+
+            var parentType = parentTypeAssignment.Reference.Type;
+            
+            // a for-loop expressions are semantically valid in places that allow array values
+            // as such a loop doesn't really transform the declared type in any way
+            // for non-array types, there's no need to propagate them further since it won't lead to anything useful
+            if (parentType is not ArrayType)
+            {
+                return null;
+            }
+
+            // pass the type through
+            return new DeclaredTypeAssignment(parentType, syntax, parentTypeAssignment.Flags);
         }
 
         private DeclaredTypeAssignment? GetObjectType(ObjectSyntax syntax)
@@ -314,10 +353,30 @@ namespace Bicep.Core.TypeSystem
                     // the declared type will be the same as the parent
                     return TryCreateAssignment(ResolveDiscriminatedObjects(moduleType.Body.Type, syntax), syntax);
 
-                case IfConditionSyntax _:
-                    // the if-condition already resolved the discriminated object, so we can reuse the type
-                    // but swap out the syntax for our object syntax
-                    return TryCreateAssignment(parentType, syntax);
+                case IfConditionSyntax _ when parentType is ResourceType resourceType:
+                    // the object literal's parent is an if condition, which falls under a resource declaration
+                    // the declared type will be the same as the parent
+                    return TryCreateAssignment(ResolveDiscriminatedObjects(resourceType.Body.Type, syntax), syntax);
+
+                case IfConditionSyntax _ when parentType is ModuleType moduleType:
+                    // the object literal's parent is an if condition, which falls under a module declaration
+                    // the declared type will be the same as the parent
+                    return TryCreateAssignment(ResolveDiscriminatedObjects(moduleType.Body.Type, syntax), syntax);
+
+                case ForSyntax _ when parentType is ArrayType arrayType:
+                    // the parent is a for-expression
+                    // this object is the body of the array, so its declared type is the type of the item
+                    switch (arrayType.Item)
+                    {
+                        case ResourceType resourceType:
+                            return TryCreateAssignment(ResolveDiscriminatedObjects(resourceType.Body.Type, syntax), syntax);
+
+                        case ModuleType moduleType:
+                            return TryCreateAssignment(ResolveDiscriminatedObjects(moduleType.Body.Type, syntax), syntax);
+
+                        default:
+                            return TryCreateAssignment(ResolveDiscriminatedObjects(arrayType.Item.Type, syntax), syntax);
+                    }
 
                 case ParameterDeclarationSyntax parameterDeclaration when ReferenceEquals(parameterDeclaration.Modifier, syntax):
                     // the object is a modifier of a parameter type
