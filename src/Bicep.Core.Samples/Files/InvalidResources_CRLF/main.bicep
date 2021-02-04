@@ -579,3 +579,143 @@ resource cyclicExistingRes 'Mock.Rp/mockExistingResource@2020-01-01' existing = 
   name: 'cyclicExistingRes'
   scope: cyclicExistingRes
 }
+
+// loop parsing cases
+resource expectedForKeyword 'Microsoft.Storage/storageAccounts@2019-06-01' = []
+
+resource expectedForKeyword2 'Microsoft.Storage/storageAccounts@2019-06-01' = [f]
+
+resource expectedLoopVar 'Microsoft.Storage/storageAccounts@2019-06-01' = [for]
+
+resource expectedInKeyword 'Microsoft.Storage/storageAccounts@2019-06-01' = [for x]
+
+resource expectedInKeyword2 'Microsoft.Storage/storageAccounts@2019-06-01' = [for x b]
+
+resource expectedArrayExpression 'Microsoft.Storage/storageAccounts@2019-06-01' = [for x in]
+
+resource expectedColon 'Microsoft.Storage/storageAccounts@2019-06-01' = [for x in y]
+
+resource expectedLoopBody 'Microsoft.Storage/storageAccounts@2019-06-01' = [for x in y:]
+
+// loop semantic analysis cases
+var emptyArray = []
+resource wrongLoopBodyType 'Microsoft.Storage/storageAccounts@2019-06-01' = [for x in emptyArray:4]
+
+// errors in the array expression
+resource arrayExpressionErrors 'Microsoft.Storage/storageAccounts@2019-06-01' = [for account in union([], 2): {
+}]
+
+// wrong array type
+var notAnArray = true
+resource wrongArrayType 'Microsoft.Storage/storageAccounts@2019-06-01' = [for account in notAnArray: {
+}]
+
+// missing required properties
+resource missingRequiredProperties 'Microsoft.Storage/storageAccounts@2019-06-01' = [for account in []: {
+}]
+
+// fewer missing required properties and a wrong property
+resource missingFewerRequiredProperties 'Microsoft.Storage/storageAccounts@2019-06-01' = [for account in []: {
+  name: account
+  location: 'eastus42'
+  properties: {
+    wrong: 'test'
+  }
+}]
+
+// wrong property inside the nested property loop
+resource wrongPropertyInNestedLoop 'Microsoft.Network/virtualNetworks@2020-06-01' = [for i in range(0, 3): {
+  name: 'vnet-${i}'
+  properties: {
+    subnets: [for j in range(0, 4): {
+      doesNotExist: 'test'
+      name: 'subnet-${i}-${j}'
+    }]
+  }
+}]
+
+// duplicate identifiers within the loop
+// (these duplicates are self-contained - usage of i above is allowed)
+resource duplicateIdentifiersWithinLoop 'Microsoft.Network/virtualNetworks@2020-06-01' = [for i in range(0, 3): {
+  name: 'vnet-${i}'
+  properties: {
+    subnets: [for i in range(0, 4): {
+      name: 'subnet-${i}-${i}'
+    }]
+  }
+}]
+
+// duplicate identifers in global and single loop scope
+var someDuplicate = 'hello'
+resource duplicateInGlobalAndOneLoop 'Microsoft.Network/virtualNetworks@2020-06-01' = [for someDuplicate in range(0, 3): {
+  name: 'vnet-${someDuplicate}'
+  properties: {
+    subnets: [for i in range(0, 4): {
+      name: 'subnet-${i}-${i}'
+    }]
+  }
+}]
+
+// duplicate in global and multiple loop scopes
+var otherDuplicate = 'hello'
+resource duplicateInGlobalAndTwoLoops 'Microsoft.Network/virtualNetworks@2020-06-01' = [for otherDuplicate in range(0, 3): {
+  name: 'vnet-${otherDuplicate}'
+  properties: {
+    subnets: [for otherDuplicate in range(0, 4): {
+      name: 'subnet-${otherDuplicate}'
+    }]
+  }
+}]
+
+// joining the other duplicates above (we should not be having multiple errors on the same identifier being duplicated)
+var someDuplicate = true
+var otherDuplicate = []
+resource duplicateInGlobalAndTwoLoops 'Microsoft.Network/virtualNetworks@2020-06-01' = [for someDuplicate in range(0, 3): {
+  name: 'vnet-${someDuplicate}'
+  properties: {
+    subnets: [for otherDuplicate in range(0, 4): {
+      name: 'subnet-${otherDuplicate}-${someDuplicate}'
+    }]
+  }
+}]
+
+/*
+  valid loop cases - this should be moved to Resources_* test case after codegen works
+*/ 
+var storageAccounts = [
+  {
+    name: 'one'
+    location: 'eastus2'
+  }
+  {
+    name: 'two'
+    location: 'westus'
+  }
+]
+// just a storage account loop
+resource storageResources 'Microsoft.Storage/storageAccounts@2019-06-01' = [for account in storageAccounts: {
+  name: account.name
+  location: account.location
+  sku: {
+    name: 'Standard_LRS'
+  }
+  kind: 'StorageV2'
+}]
+// using the same loop variable in a new language scope should be allowed
+resource premiumStorages 'Microsoft.Storage/storageAccounts@2019-06-01' = [for account in storageAccounts: {
+  name: account.name
+  location: account.location
+  sku: {
+    name: 'Premium_LRS'
+  }
+  kind: 'StorageV2'
+}]
+// basic nested loop
+resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = [for i in range(0, 3): {
+  name: 'vnet-${i}'
+  properties: {
+    subnets: [for j in range(0, 4): {
+      name: 'subnet-${i}-${j}'
+    }]
+  }
+}]
