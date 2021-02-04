@@ -451,12 +451,37 @@ resource unfinishedVnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
   }
 }
 
+/*
+Discriminator key missing
+*/
 resource discriminatorKeyMissing 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
 //@[9:32) Resource discriminatorKeyMissing. Type: Microsoft.Resources/deploymentScripts@2020-10-01. Declaration start char: 0, length: 148
   // #completionTest(0,1,2) -> discriminatorProperty
   
 }
 
+/*
+Discriminator key missing (conditional)
+*/
+resource discriminatorKeyMissing_if 'Microsoft.Resources/deploymentScripts@2020-10-01' = if(true) {
+//@[9:35) Resource discriminatorKeyMissing_if. Type: Microsoft.Resources/deploymentScripts@2020-10-01. Declaration start char: 0, length: 160
+  // #completionTest(0,1,2) -> discriminatorProperty
+  
+}
+
+/*
+Discriminator key missing (loop)
+*/
+resource discriminatorKeyMissing_for 'Microsoft.Resources/deploymentScripts@2020-10-01' = [for thing in []: {
+//@[95:100) Local thing. Type: any. Declaration start char: 95, length: 5
+//@[9:36) Resource discriminatorKeyMissing_for. Type: Microsoft.Resources/deploymentScripts@2020-10-01[]. Declaration start char: 0, length: 171
+  // #completionTest(0,1,2) -> discriminatorProperty
+  
+}]
+
+/*
+Discriminator key value missing with property access
+*/
 resource discriminatorKeyValueMissing 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
 //@[9:37) Resource discriminatorKeyValueMissing. Type: Microsoft.Resources/deploymentScripts@2020-10-01. Declaration start char: 0, length: 175
   // #completionTest(7,8,9,10) -> deploymentScriptKindsPlusSymbols
@@ -473,6 +498,48 @@ var discriminatorKeyValueMissingCompletions2 = discriminatorKeyValueMissing.
 var discriminatorKeyValueMissingCompletions3 = discriminatorKeyValueMissing[]
 //@[4:44) Variable discriminatorKeyValueMissingCompletions3. Type: error. Declaration start char: 0, length: 77
 
+/*
+Discriminator key value missing with property access (conditional)
+*/
+
+resource discriminatorKeyValueMissing_if 'Microsoft.Resources/deploymentScripts@2020-10-01' = if(false) {
+//@[9:40) Resource discriminatorKeyValueMissing_if. Type: Microsoft.Resources/deploymentScripts@2020-10-01. Declaration start char: 0, length: 188
+  // #completionTest(7,8,9,10) -> deploymentScriptKindsPlusSymbols
+  kind:   
+}
+// #completionTest(76) -> missingDiscriminatorPropertyAccess
+var discriminatorKeyValueMissingCompletions_if = discriminatorKeyValueMissing_if.p
+//@[4:46) Variable discriminatorKeyValueMissingCompletions_if. Type: any. Declaration start char: 0, length: 82
+// #completionTest(76) -> missingDiscriminatorPropertyAccess
+var discriminatorKeyValueMissingCompletions2_if = discriminatorKeyValueMissing_if.
+//@[4:47) Variable discriminatorKeyValueMissingCompletions2_if. Type: any. Declaration start char: 0, length: 82
+
+// #completionTest(76) -> missingDiscriminatorPropertyIndexPlusSymbols
+var discriminatorKeyValueMissingCompletions3_if = discriminatorKeyValueMissing_if[]
+//@[4:47) Variable discriminatorKeyValueMissingCompletions3_if. Type: error. Declaration start char: 0, length: 83
+
+/*
+Discriminator key value missing with property access (loops)
+*/
+resource discriminatorKeyValueMissing_for 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+//@[9:41) Resource discriminatorKeyValueMissing_for. Type: Microsoft.Resources/deploymentScripts@2020-10-01. Declaration start char: 0, length: 179
+  // #completionTest(7,8,9,10) -> deploymentScriptKindsPlusSymbols
+  kind:   
+}
+// #completionTest(76) -> missingDiscriminatorPropertyAccess
+var discriminatorKeyValueMissingCompletions_for = discriminatorKeyValueMissing_for.p
+//@[4:47) Variable discriminatorKeyValueMissingCompletions_for. Type: any. Declaration start char: 0, length: 84
+// #completionTest(76) -> missingDiscriminatorPropertyAccess
+var discriminatorKeyValueMissingCompletions2_for = discriminatorKeyValueMissing_for.
+//@[4:48) Variable discriminatorKeyValueMissingCompletions2_for. Type: any. Declaration start char: 0, length: 84
+
+// #completionTest(76) -> missingDiscriminatorPropertyIndexPlusSymbols
+var discriminatorKeyValueMissingCompletions3_for = discriminatorKeyValueMissing_for[]
+//@[4:48) Variable discriminatorKeyValueMissingCompletions3_for. Type: error. Declaration start char: 0, length: 85
+
+/*
+Discriminator value set 1
+*/
 resource discriminatorKeySetOne 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
 //@[9:31) Resource discriminatorKeySetOne. Type: Microsoft.Resources/deploymentScripts@2020-10-01. Declaration start char: 0, length: 264
   kind: 'AzureCLI'
@@ -494,6 +561,58 @@ var discriminatorKeySetOneCompletions2 = discriminatorKeySetOne.properties.
 var discriminatorKeySetOneCompletions3 = discriminatorKeySetOne.properties[]
 //@[4:38) Variable discriminatorKeySetOneCompletions3. Type: error. Declaration start char: 0, length: 76
 
+/*
+Discriminator value set 1 (conditional)
+*/
+resource discriminatorKeySetOne_if 'Microsoft.Resources/deploymentScripts@2020-10-01' = if(2==3) {
+//@[9:34) Resource discriminatorKeySetOne_if. Type: Microsoft.Resources/deploymentScripts@2020-10-01. Declaration start char: 0, length: 276
+  kind: 'AzureCLI'
+  // #completionTest(0,1,2) -> deploymentScriptTopLevel
+
+  properties: {
+    // #completionTest(0,1,2,3,4) -> deploymentScriptCliProperties
+    
+  }
+}
+// #completionTest(75) -> cliPropertyAccess
+var discriminatorKeySetOneCompletions_if = discriminatorKeySetOne_if.properties.a
+//@[4:40) Variable discriminatorKeySetOneCompletions_if. Type: any. Declaration start char: 0, length: 81
+// #completionTest(75) -> cliPropertyAccess
+var discriminatorKeySetOneCompletions2_if = discriminatorKeySetOne_if.properties.
+//@[4:41) Variable discriminatorKeySetOneCompletions2_if. Type: error. Declaration start char: 0, length: 81
+
+// #completionTest(75) -> cliPropertyAccessIndexesPlusSymbols
+var discriminatorKeySetOneCompletions3_if = discriminatorKeySetOne_if.properties[]
+//@[4:41) Variable discriminatorKeySetOneCompletions3_if. Type: error. Declaration start char: 0, length: 82
+
+/*
+Discriminator value set 1 (loop)
+*/
+resource discriminatorKeySetOne_for 'Microsoft.Resources/deploymentScripts@2020-10-01' = [ for thing in []: {
+//@[95:100) Local thing. Type: any. Declaration start char: 95, length: 5
+//@[9:35) Resource discriminatorKeySetOne_for. Type: Microsoft.Resources/deploymentScripts@2020-10-01[]. Declaration start char: 0, length: 288
+  kind: 'AzureCLI'
+  // #completionTest(0,1,2) -> deploymentScriptTopLevel
+
+  properties: {
+    // #completionTest(0,1,2,3,4) -> deploymentScriptCliProperties
+    
+  }
+}]
+// #completionTest(75) -> cliPropertyAccess
+var discriminatorKeySetOneCompletions_for = discriminatorKeySetOne_for.properties.a
+//@[4:41) Variable discriminatorKeySetOneCompletions_for. Type: error. Declaration start char: 0, length: 83
+// #completionTest(75) -> cliPropertyAccess
+var discriminatorKeySetOneCompletions2_for = discriminatorKeySetOne_for.properties.
+//@[4:42) Variable discriminatorKeySetOneCompletions2_for. Type: error. Declaration start char: 0, length: 83
+
+// #completionTest(75) -> cliPropertyAccessIndexesPlusSymbols
+var discriminatorKeySetOneCompletions3_for = discriminatorKeySetOne_for.properties[]
+//@[4:42) Variable discriminatorKeySetOneCompletions3_for. Type: error. Declaration start char: 0, length: 84
+
+/*
+Discriminator value set 2
+*/
 resource discriminatorKeySetTwo 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
 //@[9:31) Resource discriminatorKeySetTwo. Type: Microsoft.Resources/deploymentScripts@2020-10-01. Declaration start char: 0, length: 270
   kind: 'AzurePowerShell'
@@ -517,6 +636,62 @@ var discriminatorKeySetTwoCompletionsArrayIndexer = discriminatorKeySetTwo['prop
 // #completionTest(90) -> powershellPropertyAccess
 var discriminatorKeySetTwoCompletionsArrayIndexer2 = discriminatorKeySetTwo['properties'].
 //@[4:50) Variable discriminatorKeySetTwoCompletionsArrayIndexer2. Type: error. Declaration start char: 0, length: 90
+
+/*
+Discriminator value set 2 (conditional)
+*/
+resource discriminatorKeySetTwo_if 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+//@[9:34) Resource discriminatorKeySetTwo_if. Type: Microsoft.Resources/deploymentScripts@2020-10-01. Declaration start char: 0, length: 273
+  kind: 'AzurePowerShell'
+  // #completionTest(0,1,2) -> deploymentScriptTopLevel
+
+  properties: {
+    // #completionTest(0,1,2,3,4) -> deploymentScriptPSProperties
+    
+  }
+}
+// #completionTest(75) -> powershellPropertyAccess
+var discriminatorKeySetTwoCompletions_if = discriminatorKeySetTwo_if.properties.a
+//@[4:40) Variable discriminatorKeySetTwoCompletions_if. Type: any. Declaration start char: 0, length: 81
+// #completionTest(75) -> powershellPropertyAccess
+var discriminatorKeySetTwoCompletions2_if = discriminatorKeySetTwo_if.properties.
+//@[4:41) Variable discriminatorKeySetTwoCompletions2_if. Type: error. Declaration start char: 0, length: 81
+
+// #completionTest(90) -> powershellPropertyAccess
+var discriminatorKeySetTwoCompletionsArrayIndexer_if = discriminatorKeySetTwo_if['properties'].a
+//@[4:52) Variable discriminatorKeySetTwoCompletionsArrayIndexer_if. Type: any. Declaration start char: 0, length: 96
+// #completionTest(90) -> powershellPropertyAccess
+var discriminatorKeySetTwoCompletionsArrayIndexer2_if = discriminatorKeySetTwo_if['properties'].
+//@[4:53) Variable discriminatorKeySetTwoCompletionsArrayIndexer2_if. Type: error. Declaration start char: 0, length: 96
+
+/*
+Discriminator value set 2 (loops)
+*/
+resource discriminatorKeySetTwo_for 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+//@[9:35) Resource discriminatorKeySetTwo_for. Type: Microsoft.Resources/deploymentScripts@2020-10-01. Declaration start char: 0, length: 274
+  kind: 'AzurePowerShell'
+  // #completionTest(0,1,2) -> deploymentScriptTopLevel
+
+  properties: {
+    // #completionTest(0,1,2,3,4) -> deploymentScriptPSProperties
+    
+  }
+}
+// #completionTest(75) -> powershellPropertyAccess
+var discriminatorKeySetTwoCompletions_for = discriminatorKeySetTwo_for.properties.a
+//@[4:41) Variable discriminatorKeySetTwoCompletions_for. Type: any. Declaration start char: 0, length: 83
+// #completionTest(75) -> powershellPropertyAccess
+var discriminatorKeySetTwoCompletions2_for = discriminatorKeySetTwo_for.properties.
+//@[4:42) Variable discriminatorKeySetTwoCompletions2_for. Type: error. Declaration start char: 0, length: 83
+
+// #completionTest(90) -> powershellPropertyAccess
+var discriminatorKeySetTwoCompletionsArrayIndexer_for = discriminatorKeySetTwo_for['properties'].a
+//@[4:53) Variable discriminatorKeySetTwoCompletionsArrayIndexer_for. Type: any. Declaration start char: 0, length: 98
+// #completionTest(90) -> powershellPropertyAccess
+var discriminatorKeySetTwoCompletionsArrayIndexer2_for = discriminatorKeySetTwo_for['properties'].
+//@[4:54) Variable discriminatorKeySetTwoCompletionsArrayIndexer2_for. Type: error. Declaration start char: 0, length: 98
+
+
 
 resource incorrectPropertiesKey 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
 //@[9:31) Resource incorrectPropertiesKey. Type: Microsoft.Resources/deploymentScripts@2020-10-01. Declaration start char: 0, length: 132
@@ -582,6 +757,9 @@ var letsAccessTheDashes = dashesInPropertyNames.properties.autoScalerProfile.s
 var letsAccessTheDashes2 = dashesInPropertyNames.properties.autoScalerProfile.
 //@[4:24) Variable letsAccessTheDashes2. Type: error. Declaration start char: 0, length: 78
 
+/* 
+Nested discriminator missing key
+*/
 resource nestedDiscriminatorMissingKey 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = {
 //@[9:38) Resource nestedDiscriminatorMissingKey. Type: Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview. Declaration start char: 0, length: 190
   name: 'test'
@@ -602,6 +780,57 @@ var nestedDiscriminatorMissingKeyCompletions2 = nestedDiscriminatorMissingKey['p
 var nestedDiscriminatorMissingKeyIndexCompletions = nestedDiscriminatorMissingKey.properties['']
 //@[4:49) Variable nestedDiscriminatorMissingKeyIndexCompletions. Type: any. Declaration start char: 0, length: 96
 
+/* 
+Nested discriminator missing key (conditional)
+*/
+resource nestedDiscriminatorMissingKey_if 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = if(bool(1)) {
+//@[9:41) Resource nestedDiscriminatorMissingKey_if. Type: Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview. Declaration start char: 0, length: 205
+  name: 'test'
+  location: 'l'
+  properties: {
+    //createMode: 'Default'
+
+  }
+}
+// #completionTest(90) -> createMode
+var nestedDiscriminatorMissingKeyCompletions_if = nestedDiscriminatorMissingKey_if.properties.cr
+//@[4:47) Variable nestedDiscriminatorMissingKeyCompletions_if. Type: any. Declaration start char: 0, length: 96
+// #completionTest(92) -> createMode
+var nestedDiscriminatorMissingKeyCompletions2_if = nestedDiscriminatorMissingKey_if['properties'].
+//@[4:48) Variable nestedDiscriminatorMissingKeyCompletions2_if. Type: any. Declaration start char: 0, length: 98
+
+// #completionTest(94) -> createModeIndexPlusSymbols
+var nestedDiscriminatorMissingKeyIndexCompletions_if = nestedDiscriminatorMissingKey_if.properties['']
+//@[4:52) Variable nestedDiscriminatorMissingKeyIndexCompletions_if. Type: any. Declaration start char: 0, length: 102
+
+/* 
+Nested discriminator missing key (loop)
+*/
+resource nestedDiscriminatorMissingKey_for 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = [for thing in []: {
+//@[109:114) Local thing. Type: any. Declaration start char: 109, length: 5
+//@[9:42) Resource nestedDiscriminatorMissingKey_for. Type: Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview[]. Declaration start char: 0, length: 213
+  name: 'test'
+  location: 'l'
+  properties: {
+    //createMode: 'Default'
+
+  }
+}]
+// #completionTest(90) -> createMode
+var nestedDiscriminatorMissingKeyCompletions_for = nestedDiscriminatorMissingKey_for.properties.cr
+//@[4:48) Variable nestedDiscriminatorMissingKeyCompletions_for. Type: error. Declaration start char: 0, length: 98
+// #completionTest(92) -> createMode
+var nestedDiscriminatorMissingKeyCompletions2_for = nestedDiscriminatorMissingKey_for['properties'].
+//@[4:49) Variable nestedDiscriminatorMissingKeyCompletions2_for. Type: error. Declaration start char: 0, length: 100
+
+// #completionTest(94) -> createModeIndexPlusSymbols
+var nestedDiscriminatorMissingKeyIndexCompletions_for = nestedDiscriminatorMissingKey_for.properties['']
+//@[4:53) Variable nestedDiscriminatorMissingKeyIndexCompletions_for. Type: error. Declaration start char: 0, length: 104
+
+
+/*
+Nested discriminator
+*/
 resource nestedDiscriminator 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = {
 //@[9:28) Resource nestedDiscriminator. Type: Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview. Declaration start char: 0, length: 178
   name: 'test'
@@ -627,6 +856,66 @@ var nestedDiscriminatorCompletions4 = nestedDiscriminator['properties'].
 // #completionTest(79) -> defaultCreateModeIndexes
 var nestedDiscriminatorArrayIndexCompletions = nestedDiscriminator.properties[a]
 //@[4:44) Variable nestedDiscriminatorArrayIndexCompletions. Type: error. Declaration start char: 0, length: 80
+
+/*
+Nested discriminator (conditional)
+*/
+resource nestedDiscriminator_if 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = if(true) {
+//@[9:31) Resource nestedDiscriminator_if. Type: Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview. Declaration start char: 0, length: 190
+  name: 'test'
+  location: 'l'
+  properties: {
+    createMode: 'Default'
+
+  }
+}
+// #completionTest(69) -> defaultCreateModeProperties
+var nestedDiscriminatorCompletions_if = nestedDiscriminator_if.properties.a
+//@[4:37) Variable nestedDiscriminatorCompletions_if. Type: any. Declaration start char: 0, length: 75
+// #completionTest(73) -> defaultCreateModeProperties
+var nestedDiscriminatorCompletions2_if = nestedDiscriminator_if['properties'].a
+//@[4:38) Variable nestedDiscriminatorCompletions2_if. Type: any. Declaration start char: 0, length: 79
+// #completionTest(69) -> defaultCreateModeProperties
+var nestedDiscriminatorCompletions3_if = nestedDiscriminator_if.properties.
+//@[4:38) Variable nestedDiscriminatorCompletions3_if. Type: error. Declaration start char: 0, length: 75
+// #completionTest(72) -> defaultCreateModeProperties
+var nestedDiscriminatorCompletions4_if = nestedDiscriminator_if['properties'].
+//@[4:38) Variable nestedDiscriminatorCompletions4_if. Type: error. Declaration start char: 0, length: 78
+
+// #completionTest(79) -> defaultCreateModeIndexes
+var nestedDiscriminatorArrayIndexCompletions = nestedDiscriminator_if.properties[a]
+//@[4:44) Variable nestedDiscriminatorArrayIndexCompletions. Type: error. Declaration start char: 0, length: 83
+
+
+/*
+Nested discriminator (loop)
+*/
+resource nestedDiscriminator_for 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = [for thing in []: {
+//@[99:104) Local thing. Type: any. Declaration start char: 99, length: 5
+//@[9:32) Resource nestedDiscriminator_for. Type: Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview[]. Declaration start char: 0, length: 201
+  name: 'test'
+  location: 'l'
+  properties: {
+    createMode: 'Default'
+
+  }
+}]
+// #completionTest(69) -> defaultCreateModeProperties
+var nestedDiscriminatorCompletions_for = nestedDiscriminator_for.properties.a
+//@[4:38) Variable nestedDiscriminatorCompletions_for. Type: error. Declaration start char: 0, length: 77
+// #completionTest(73) -> defaultCreateModeProperties
+var nestedDiscriminatorCompletions2_for = nestedDiscriminator_for['properties'].a
+//@[4:39) Variable nestedDiscriminatorCompletions2_for. Type: error. Declaration start char: 0, length: 81
+// #completionTest(69) -> defaultCreateModeProperties
+var nestedDiscriminatorCompletions3_for = nestedDiscriminator_for.properties.
+//@[4:39) Variable nestedDiscriminatorCompletions3_for. Type: error. Declaration start char: 0, length: 77
+// #completionTest(72) -> defaultCreateModeProperties
+var nestedDiscriminatorCompletions4_for = nestedDiscriminator_for['properties'].
+//@[4:39) Variable nestedDiscriminatorCompletions4_for. Type: error. Declaration start char: 0, length: 80
+
+// #completionTest(79) -> defaultCreateModeIndexes
+var nestedDiscriminatorArrayIndexCompletions_for = nestedDiscriminator_for.properties[a]
+//@[4:48) Variable nestedDiscriminatorArrayIndexCompletions_for. Type: error. Declaration start char: 0, length: 88
 
 // sample resource to validate completions on the next declarations
 resource nestedPropertyAccessOnConditional 'Microsoft.Compute/virtualMachines@2020-06-01' = if(true) {
@@ -894,22 +1183,24 @@ resource storageResources 'Microsoft.Storage/storageAccounts@2019-06-01' = [for 
 // using the same loop variable in a new language scope should be allowed
 resource premiumStorages 'Microsoft.Storage/storageAccounts@2019-06-01' = [for account in storageAccounts: {
 //@[79:86) Local account. Type: any. Declaration start char: 79, length: 7
-//@[9:24) Resource premiumStorages. Type: Microsoft.Storage/storageAccounts@2019-06-01[]. Declaration start char: 0, length: 225
+//@[9:24) Resource premiumStorages. Type: Microsoft.Storage/storageAccounts@2019-06-01[]. Declaration start char: 0, length: 271
   name: account.name
   location: account.location
   sku: {
-    name: 'Premium_LRS'
+    // #completionTest(9,10) -> storageSkuNamePlusSymbols
+    name: 
   }
   kind: 'StorageV2'
 }]
 // basic nested loop
 resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = [for i in range(0, 3): {
 //@[68:69) Local i. Type: any. Declaration start char: 68, length: 1
-//@[9:13) Resource vnet. Type: Microsoft.Network/virtualNetworks@2020-06-01[]. Declaration start char: 0, length: 213
+//@[9:13) Resource vnet. Type: Microsoft.Network/virtualNetworks@2020-06-01[]. Declaration start char: 0, length: 279
   name: 'vnet-${i}'
   properties: {
     subnets: [for j in range(0, 4): {
 //@[18:19) Local j. Type: any. Declaration start char: 18, length: 1
+      // #completionTest(0,1,2,3,4,5,6) -> subnetIdAndProperties
       name: 'subnet-${i}-${j}'
     }]
   }

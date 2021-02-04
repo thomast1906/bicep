@@ -372,11 +372,33 @@ resource unfinishedVnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
   }
 }
 
+/*
+Discriminator key missing
+*/
 resource discriminatorKeyMissing 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   // #completionTest(0,1,2) -> discriminatorProperty
   
 }
 
+/*
+Discriminator key missing (conditional)
+*/
+resource discriminatorKeyMissing_if 'Microsoft.Resources/deploymentScripts@2020-10-01' = if(true) {
+  // #completionTest(0,1,2) -> discriminatorProperty
+  
+}
+
+/*
+Discriminator key missing (loop)
+*/
+resource discriminatorKeyMissing_for 'Microsoft.Resources/deploymentScripts@2020-10-01' = [for thing in []: {
+  // #completionTest(0,1,2) -> discriminatorProperty
+  
+}]
+
+/*
+Discriminator key value missing with property access
+*/
 resource discriminatorKeyValueMissing 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   // #completionTest(7,8,9,10) -> deploymentScriptKindsPlusSymbols
   kind:   
@@ -389,6 +411,40 @@ var discriminatorKeyValueMissingCompletions2 = discriminatorKeyValueMissing.
 // #completionTest(76) -> missingDiscriminatorPropertyIndexPlusSymbols
 var discriminatorKeyValueMissingCompletions3 = discriminatorKeyValueMissing[]
 
+/*
+Discriminator key value missing with property access (conditional)
+*/
+
+resource discriminatorKeyValueMissing_if 'Microsoft.Resources/deploymentScripts@2020-10-01' = if(false) {
+  // #completionTest(7,8,9,10) -> deploymentScriptKindsPlusSymbols
+  kind:   
+}
+// #completionTest(82) -> missingDiscriminatorPropertyAccess
+var discriminatorKeyValueMissingCompletions_if = discriminatorKeyValueMissing_if.p
+// #completionTest(82) -> missingDiscriminatorPropertyAccess
+var discriminatorKeyValueMissingCompletions2_if = discriminatorKeyValueMissing_if.
+
+// #completionTest(82) -> missingDiscriminatorPropertyIndexPlusSymbols
+var discriminatorKeyValueMissingCompletions3_if = discriminatorKeyValueMissing_if[]
+
+/*
+Discriminator key value missing with property access (loops)
+*/
+resource discriminatorKeyValueMissing_for 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  // #completionTest(7,8,9,10) -> deploymentScriptKindsPlusSymbols
+  kind:   
+}
+// #completionTest(84) -> missingDiscriminatorPropertyAccess
+var discriminatorKeyValueMissingCompletions_for = discriminatorKeyValueMissing_for.p
+// #completionTest(84) -> missingDiscriminatorPropertyAccess
+var discriminatorKeyValueMissingCompletions2_for = discriminatorKeyValueMissing_for.
+
+// #completionTest(84) -> missingDiscriminatorPropertyIndexPlusSymbols
+var discriminatorKeyValueMissingCompletions3_for = discriminatorKeyValueMissing_for[]
+
+/*
+Discriminator value set 1
+*/
 resource discriminatorKeySetOne 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   kind: 'AzureCLI'
   // #completionTest(0,1,2) -> deploymentScriptTopLevel
@@ -406,6 +462,49 @@ var discriminatorKeySetOneCompletions2 = discriminatorKeySetOne.properties.
 // #completionTest(75) -> cliPropertyAccessIndexesPlusSymbols
 var discriminatorKeySetOneCompletions3 = discriminatorKeySetOne.properties[]
 
+/*
+Discriminator value set 1 (conditional)
+*/
+resource discriminatorKeySetOne_if 'Microsoft.Resources/deploymentScripts@2020-10-01' = if(2==3) {
+  kind: 'AzureCLI'
+  // #completionTest(0,1,2) -> deploymentScriptTopLevel
+
+  properties: {
+    // #completionTest(0,1,2,3,4) -> deploymentScriptCliProperties
+    
+  }
+}
+// #completionTest(81) -> cliPropertyAccess
+var discriminatorKeySetOneCompletions_if = discriminatorKeySetOne_if.properties.a
+// #completionTest(81) -> cliPropertyAccess
+var discriminatorKeySetOneCompletions2_if = discriminatorKeySetOne_if.properties.
+
+// #completionTest(81) -> cliPropertyAccessIndexesPlusSymbols
+var discriminatorKeySetOneCompletions3_if = discriminatorKeySetOne_if.properties[]
+
+/*
+Discriminator value set 1 (loop)
+*/
+resource discriminatorKeySetOne_for 'Microsoft.Resources/deploymentScripts@2020-10-01' = [ for thing in []: {
+  kind: 'AzureCLI'
+  // #completionTest(0,1,2) -> deploymentScriptTopLevel
+
+  properties: {
+    // #completionTest(0,1,2,3,4) -> deploymentScriptCliProperties
+    
+  }
+}]
+// #completionTest(83) -> cliPropertyAccess
+var discriminatorKeySetOneCompletions_for = discriminatorKeySetOne_for.properties.a
+// #completionTest(83) -> cliPropertyAccess
+var discriminatorKeySetOneCompletions2_for = discriminatorKeySetOne_for.properties.
+
+// #completionTest(83) -> cliPropertyAccessIndexesPlusSymbols
+var discriminatorKeySetOneCompletions3_for = discriminatorKeySetOne_for.properties[]
+
+/*
+Discriminator value set 2
+*/
 resource discriminatorKeySetTwo 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   kind: 'AzurePowerShell'
   // #completionTest(0,1,2) -> deploymentScriptTopLevel
@@ -424,6 +523,52 @@ var discriminatorKeySetTwoCompletions2 = discriminatorKeySetTwo.properties.
 var discriminatorKeySetTwoCompletionsArrayIndexer = discriminatorKeySetTwo['properties'].a
 // #completionTest(90) -> powershellPropertyAccess
 var discriminatorKeySetTwoCompletionsArrayIndexer2 = discriminatorKeySetTwo['properties'].
+
+/*
+Discriminator value set 2 (conditional)
+*/
+resource discriminatorKeySetTwo_if 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  kind: 'AzurePowerShell'
+  // #completionTest(0,1,2) -> deploymentScriptTopLevel
+
+  properties: {
+    // #completionTest(0,1,2,3,4) -> deploymentScriptPSProperties
+    
+  }
+}
+// #completionTest(81) -> powershellPropertyAccess
+var discriminatorKeySetTwoCompletions_if = discriminatorKeySetTwo_if.properties.a
+// #completionTest(81) -> powershellPropertyAccess
+var discriminatorKeySetTwoCompletions2_if = discriminatorKeySetTwo_if.properties.
+
+// #completionTest(96) -> powershellPropertyAccess
+var discriminatorKeySetTwoCompletionsArrayIndexer_if = discriminatorKeySetTwo_if['properties'].a
+// #completionTest(96) -> powershellPropertyAccess
+var discriminatorKeySetTwoCompletionsArrayIndexer2_if = discriminatorKeySetTwo_if['properties'].
+
+/*
+Discriminator value set 2 (loops)
+*/
+resource discriminatorKeySetTwo_for 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  kind: 'AzurePowerShell'
+  // #completionTest(0,1,2) -> deploymentScriptTopLevel
+
+  properties: {
+    // #completionTest(0,1,2,3,4) -> deploymentScriptPSProperties
+    
+  }
+}
+// #completionTest(83) -> powershellPropertyAccess
+var discriminatorKeySetTwoCompletions_for = discriminatorKeySetTwo_for.properties.a
+// #completionTest(83) -> powershellPropertyAccess
+var discriminatorKeySetTwoCompletions2_for = discriminatorKeySetTwo_for.properties.
+
+// #completionTest(98) -> powershellPropertyAccess
+var discriminatorKeySetTwoCompletionsArrayIndexer_for = discriminatorKeySetTwo_for['properties'].a
+// #completionTest(98) -> powershellPropertyAccess
+var discriminatorKeySetTwoCompletionsArrayIndexer2_for = discriminatorKeySetTwo_for['properties'].
+
+
 
 resource incorrectPropertiesKey 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   kind: 'AzureCLI'
@@ -480,6 +625,9 @@ var letsAccessTheDashes = dashesInPropertyNames.properties.autoScalerProfile.s
 // #completionTest(78) -> autoScalerPropertiesRequireEscaping
 var letsAccessTheDashes2 = dashesInPropertyNames.properties.autoScalerProfile.
 
+/* 
+Nested discriminator missing key
+*/
 resource nestedDiscriminatorMissingKey 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = {
   name: 'test'
   location: 'l'
@@ -496,6 +644,48 @@ var nestedDiscriminatorMissingKeyCompletions2 = nestedDiscriminatorMissingKey['p
 // #completionTest(94) -> createModeIndexPlusSymbols
 var nestedDiscriminatorMissingKeyIndexCompletions = nestedDiscriminatorMissingKey.properties['']
 
+/* 
+Nested discriminator missing key (conditional)
+*/
+resource nestedDiscriminatorMissingKey_if 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = if(bool(1)) {
+  name: 'test'
+  location: 'l'
+  properties: {
+    //createMode: 'Default'
+
+  }
+}
+// #completionTest(96) -> createMode
+var nestedDiscriminatorMissingKeyCompletions_if = nestedDiscriminatorMissingKey_if.properties.cr
+// #completionTest(98) -> createMode
+var nestedDiscriminatorMissingKeyCompletions2_if = nestedDiscriminatorMissingKey_if['properties'].
+
+// #completionTest(100) -> createModeIndexPlusSymbols
+var nestedDiscriminatorMissingKeyIndexCompletions_if = nestedDiscriminatorMissingKey_if.properties['']
+
+/* 
+Nested discriminator missing key (loop)
+*/
+resource nestedDiscriminatorMissingKey_for 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = [for thing in []: {
+  name: 'test'
+  location: 'l'
+  properties: {
+    //createMode: 'Default'
+
+  }
+}]
+// #completionTest(98) -> createMode
+var nestedDiscriminatorMissingKeyCompletions_for = nestedDiscriminatorMissingKey_for.properties.cr
+// #completionTest(100) -> createMode
+var nestedDiscriminatorMissingKeyCompletions2_for = nestedDiscriminatorMissingKey_for['properties'].
+
+// #completionTest(102) -> createModeIndexPlusSymbols
+var nestedDiscriminatorMissingKeyIndexCompletions_for = nestedDiscriminatorMissingKey_for.properties['']
+
+
+/*
+Nested discriminator
+*/
 resource nestedDiscriminator 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = {
   name: 'test'
   location: 'l'
@@ -515,6 +705,53 @@ var nestedDiscriminatorCompletions4 = nestedDiscriminator['properties'].
 
 // #completionTest(79) -> defaultCreateModeIndexes
 var nestedDiscriminatorArrayIndexCompletions = nestedDiscriminator.properties[a]
+
+/*
+Nested discriminator (conditional)
+*/
+resource nestedDiscriminator_if 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = if(true) {
+  name: 'test'
+  location: 'l'
+  properties: {
+    createMode: 'Default'
+
+  }
+}
+// #completionTest(75) -> defaultCreateModeProperties
+var nestedDiscriminatorCompletions_if = nestedDiscriminator_if.properties.a
+// #completionTest(79) -> defaultCreateModeProperties
+var nestedDiscriminatorCompletions2_if = nestedDiscriminator_if['properties'].a
+// #completionTest(75) -> defaultCreateModeProperties
+var nestedDiscriminatorCompletions3_if = nestedDiscriminator_if.properties.
+// #completionTest(78) -> defaultCreateModeProperties
+var nestedDiscriminatorCompletions4_if = nestedDiscriminator_if['properties'].
+
+// #completionTest(85) -> defaultCreateModeIndexes
+var nestedDiscriminatorArrayIndexCompletions_if = nestedDiscriminator_if.properties[a]
+
+
+/*
+Nested discriminator (loop)
+*/
+resource nestedDiscriminator_for 'Microsoft.DocumentDB/databaseAccounts@2020-06-01-preview' = [for thing in []: {
+  name: 'test'
+  location: 'l'
+  properties: {
+    createMode: 'Default'
+
+  }
+}]
+// #completionTest(77) -> defaultCreateModeProperties
+var nestedDiscriminatorCompletions_for = nestedDiscriminator_for.properties.a
+// #completionTest(81) -> defaultCreateModeProperties
+var nestedDiscriminatorCompletions2_for = nestedDiscriminator_for['properties'].a
+// #completionTest(77) -> defaultCreateModeProperties
+var nestedDiscriminatorCompletions3_for = nestedDiscriminator_for.properties.
+// #completionTest(80) -> defaultCreateModeProperties
+var nestedDiscriminatorCompletions4_for = nestedDiscriminator_for['properties'].
+
+// #completionTest(87) -> defaultCreateModeIndexes
+var nestedDiscriminatorArrayIndexCompletions_for = nestedDiscriminator_for.properties[a]
 
 // sample resource to validate completions on the next declarations
 resource nestedPropertyAccessOnConditional 'Microsoft.Compute/virtualMachines@2020-06-01' = if(true) {
@@ -720,7 +957,8 @@ resource premiumStorages 'Microsoft.Storage/storageAccounts@2019-06-01' = [for a
   name: account.name
   location: account.location
   sku: {
-    name: 'Premium_LRS'
+    // #completionTest(9,10) -> storageSkuNamePlusSymbols
+    name: 
   }
   kind: 'StorageV2'
 }]
@@ -729,6 +967,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = [for i in range(0
   name: 'vnet-${i}'
   properties: {
     subnets: [for j in range(0, 4): {
+      // #completionTest(0,1,2,3,4,5,6) -> subnetIdAndProperties
       name: 'subnet-${i}-${j}'
     }]
   }
